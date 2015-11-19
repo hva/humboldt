@@ -19,7 +19,7 @@ public class QuerProduct {
 			System.out.println("Keine Zahl im Integerbereich hatt Querprodukt von mehr als 9 Schritten");
 			System.exit(-1);
 		}
-		
+
 		for (int i = 0; i < Integer.MAX_VALUE; i++) {
 			int k = 0;
 			int output = i;
