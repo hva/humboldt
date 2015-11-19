@@ -24,9 +24,14 @@ public class Banner {
 	};
 	
 	public static void main(String[] args) {
+		if (args.length < 1) {
+			System.out.println("Ungültige Anzahl an Parametern");
+			System.exit(-1);
+		}		
+		
 		String text = args[0];
 
-		if (text.length()> 10) {
+		if (text.length() > 10) {
 			 text = text.substring(0, 10);
 		}
 		
@@ -40,7 +45,7 @@ public class Banner {
 		
 		for (int i = 0; i < 4; i++) {
 			for (int t = 0; t < text.length(); t++) {
-				String s = text.substring(t,t+1);
+				String s = text.substring(t, t+1);
 				int digit = Integer.parseInt(s);
 				for (int j = 0; j < 4; j++) {
 					int value = masks[digit][i][j];
