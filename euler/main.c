@@ -17,10 +17,6 @@ list_t * list_new();
 void list_destroy(list_t *);
 void list_push(list_t *, int);
 
-/*
-void print_list(node_t *head);
-*/
-
 int main(int argc, char** argv)
 {
 	/* check input args */
@@ -82,26 +78,41 @@ list_t * list_new() {
 	return list;
 }
 
-
 void list_destroy(list_t *list) {
-	if (list != NULL) {
-		free(list);
+	if (list == NULL) {
+		return;
 	}
+
+	list_node_t *current = list->head, *tmp;
+	while (current != NULL) {
+		tmp = current;
+		current = current->next;
+		free(tmp);
+	}
+
+	free(list);
 }
 
 void list_push(list_t *list, int val) {
 	if (list == NULL) {
 		return;
 	}
-}
 
-/*
-void print_list(node_t * head) {
-	node_t * current = head;
+	list_node_t *node = malloc(sizeof(list_node_t));
+	node->val = val;
+	node->next = NULL;
 
-	while (current != NULL) {
-		fprintf(stderr, "%d\n", current->val);
+	list->len++;
+
+	if (list->head == NULL) {
+		list->head = node;
+		return;
+	}
+
+	list_node_t *current = list->head;
+	while (current->next != NULL) {
 		current = current->next;
 	}
+
+	current->next = node;
 }
-*/
