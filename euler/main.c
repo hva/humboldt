@@ -1,14 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/* linked list type */
-typedef struct node {
-    int val;
-    struct node * next;
-} node_t;
+/* types */
+typedef struct list_node {
+	int val;
+	struct list_node *next;
+} list_node_t;
 
-void push(node_t *head, int val);
+typedef struct {
+	int len;
+	struct list_node *head;
+} list_t;
+
+/* functions */
+list_t * list_new();
+void list_destroy(list_t *);
+void list_push(list_t *, int);
+
+/*
 void print_list(node_t *head);
+*/
 
 int main(int argc, char** argv)
 {
@@ -37,11 +48,10 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	node_t *adj[v];
+	list_t **adj = malloc(v * sizeof(list_t *));
 	int i;
-	for (i = 0; i < v; i++)
-	{
-		adj[i] = NULL;
+	for (i = 0; i < v; i++) {
+		adj[i] = list_new();
 	}
 
 	while ((x = fscanf(fi, "%d %d", &a, &b)) != EOF) {
@@ -49,55 +59,49 @@ int main(int argc, char** argv)
 			fprintf(stderr, "invalid input\n");
 			return 1;
 		}
-
-		if (adj[a] == NULL) {
-			adj[a] = malloc(sizeof(node_t));
-			adj[a]->val = b;
-			adj[a]->next = NULL;
-		}
-		else {
-			push(adj[a], b);
-		}
-
-		if (adj[b] == NULL) {
-			adj[b] = malloc(sizeof(node_t));
-			adj[b]->val = a;
-			adj[b]->next = NULL;
-		}
-		else {
-			push(adj[b], a);
-		}
-
+		list_push(adj[a], b);
+		list_push(adj[b], a);
 	}
 
 	/* close file */
 	fclose(fi);
 
-	for (i = 0; i < v; i++)
-	{
-		fprintf(stderr, "----%d\n", i);
-		print_list(adj[i]);
+	/* cleanup */
+	for (i = 0; i < v; i++)	{
+		printf("[%d] -> %d\n", i, adj[i]->len);
+		list_destroy(adj[i]);
+	}
+	free(adj);
+}
+
+list_t * list_new() {
+	list_t *list;
+	list = malloc(sizeof(list_t));
+	list->len = 0;
+	list->head = NULL;
+	return list;
+}
+
+
+void list_destroy(list_t *list) {
+	if (list != NULL) {
+		free(list);
 	}
 }
 
-
-void print_list(node_t * head) {
-    node_t * current = head;
-
-    while (current != NULL) {
-        fprintf(stderr, "%d\n", current->val);
-        current = current->next;
-    }
+void list_push(list_t *list, int val) {
+	if (list == NULL) {
+		return;
+	}
 }
 
-void push(node_t *head, int val) {
+/*
+void print_list(node_t * head) {
 	node_t * current = head;
 
-    while (current->next != NULL) {
-        current = current->next;
-    }
-
-    current->next = malloc(sizeof(node_t));
-    current->next->val = val;
-    current->next->next = NULL;
+	while (current != NULL) {
+		fprintf(stderr, "%d\n", current->val);
+		current = current->next;
+	}
 }
+*/
