@@ -8,14 +8,14 @@ typedef struct list_node {
 } list_node_t;
 
 typedef struct {
-	int len;
 	struct list_node *head;
 } list_t;
 
 /* functions */
 list_t * list_new();
-void list_destroy(list_t *);
+int list_len(list_t *);
 void list_push(list_t *, int);
+void list_destroy(list_t *);
 
 int main(int argc, char** argv)
 {
@@ -64,7 +64,7 @@ int main(int argc, char** argv)
 
 	/* cleanup */
 	for (i = 0; i < v; i++)	{
-		printf("[%d] -> %d\n", i, adj[i]->len);
+		printf("[%d] -> %d\n", i, list_len(adj[i]));
 		list_destroy(adj[i]);
 	}
 	free(adj);
@@ -73,9 +73,40 @@ int main(int argc, char** argv)
 list_t * list_new() {
 	list_t *list;
 	list = malloc(sizeof(list_t));
-	list->len = 0;
 	list->head = NULL;
 	return list;
+}
+
+int list_len(list_t *list) {
+	int len = 0;
+	list_node_t *current = list->head;
+	while(current != NULL) {
+		current = current->next;
+		len++;
+	}
+	return len;
+}
+
+void list_push(list_t *list, int val) {
+	if (list == NULL) {
+		return;
+	}
+
+	list_node_t *node = malloc(sizeof(list_node_t));
+	node->val = val;
+	node->next = NULL;
+
+	if (list->head == NULL) {
+		list->head = node;
+		return;
+	}
+
+	list_node_t *current = list->head;
+	while (current->next != NULL) {
+		current = current->next;
+	}
+
+	current->next = node;
 }
 
 void list_destroy(list_t *list) {
@@ -91,28 +122,4 @@ void list_destroy(list_t *list) {
 	}
 
 	free(list);
-}
-
-void list_push(list_t *list, int val) {
-	if (list == NULL) {
-		return;
-	}
-
-	list_node_t *node = malloc(sizeof(list_node_t));
-	node->val = val;
-	node->next = NULL;
-
-	list->len++;
-
-	if (list->head == NULL) {
-		list->head = node;
-		return;
-	}
-
-	list_node_t *current = list->head;
-	while (current->next != NULL) {
-		current = current->next;
-	}
-
-	current->next = node;
 }
