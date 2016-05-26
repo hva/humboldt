@@ -15,6 +15,7 @@ typedef struct {
 list_t * list_new();
 void list_push(list_t *, int);
 int list_pop(list_t *);
+int list_len(list_t *);
 void list_print(list_t *);
 void list_destroy(list_t *);
 
@@ -63,18 +64,21 @@ int main(int argc, char** argv)
 	/* close file */
 	fclose(fi);
 
+	/* check is eulerian path exists */
+	int odd = 0;
+	for (i = 0; i < v; i++)	{
+		if (list_len(adj[i]) & 1) {
+			odd++;
+		}
+	}
+
+	if (odd != 0 && odd != 2) {
+		fprintf(stderr, "eulerian path does not exist\n");
+		return 1;
+	}
+
 	/* cleanup */
 	for (i = 0; i < v; i++)	{
-		printf("\n");
-		printf("%d ->", i);
-		list_print(adj[i]);
-
-		printf("%d\n", list_pop(adj[i]));
-		printf("%d\n", list_pop(adj[i]));
-
-		printf("%d ->", i);
-		list_print(adj[i]);
-
 		list_destroy(adj[i]);
 	}
 	free(adj);
@@ -128,6 +132,16 @@ int list_pop(list_t *list) {
 	val = last->val;
 	free(last);
 	return val;
+}
+
+int list_len(list_t *list) {
+	int len = 0;
+	list_node_t *current = list->head;
+	while(current != NULL) {
+		current = current->next;
+		len++;
+	}
+	return len;
 }
 
 void list_print(list_t *list) {
