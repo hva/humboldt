@@ -13,8 +13,8 @@ typedef struct {
 
 /* functions */
 list_t * list_new();
-int list_len(list_t *);
 void list_push(list_t *, int);
+void list_print(list_t *);
 void list_destroy(list_t *);
 
 int main(int argc, char** argv)
@@ -64,7 +64,8 @@ int main(int argc, char** argv)
 
 	/* cleanup */
 	for (i = 0; i < v; i++)	{
-		printf("[%d] -> %d\n", i, list_len(adj[i]));
+		printf("%d ->", i);
+		list_print(adj[i]);
 		list_destroy(adj[i]);
 	}
 	free(adj);
@@ -75,16 +76,6 @@ list_t * list_new() {
 	list = malloc(sizeof(list_t));
 	list->head = NULL;
 	return list;
-}
-
-int list_len(list_t *list) {
-	int len = 0;
-	list_node_t *current = list->head;
-	while(current != NULL) {
-		current = current->next;
-		len++;
-	}
-	return len;
 }
 
 void list_push(list_t *list, int val) {
@@ -107,6 +98,15 @@ void list_push(list_t *list, int val) {
 	}
 
 	current->next = node;
+}
+
+void list_print(list_t *list) {
+	list_node_t *current = list->head;
+	while(current != NULL) {
+		printf(" %d", current->val);
+		current = current->next;
+	}
+	printf("\n");
 }
 
 void list_destroy(list_t *list) {
