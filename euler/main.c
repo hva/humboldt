@@ -18,6 +18,7 @@ int list_pop(list_t *);
 int list_len(list_t *);
 void list_print(list_t *);
 void list_destroy(list_t *);
+void cleanup(list_t **, int);
 
 int main(int argc, char** argv)
 {
@@ -43,6 +44,7 @@ int main(int argc, char** argv)
 
 	if (x == EOF || x == 0) {
 		fprintf(stderr, "invalid input\n");
+		fclose(fi);
 		return 1;
 	}
 
@@ -55,6 +57,8 @@ int main(int argc, char** argv)
 	while ((x = fscanf(fi, "%d %d", &a, &b)) != EOF) {
 		if (x == 0) {
 			fprintf(stderr, "invalid input\n");
+			fclose(fi);
+			cleanup(adj, v);
 			return 1;
 		}
 		list_push(adj[a], b);
@@ -65,23 +69,23 @@ int main(int argc, char** argv)
 	fclose(fi);
 
 	/* check is eulerian path exists */
-	int odd = 0;
+	int odd = 0, location;
 	for (i = 0; i < v; i++)	{
 		if (list_len(adj[i]) & 1) {
 			odd++;
+			location = i;
 		}
 	}
 
 	if (odd != 0 && odd != 2) {
 		fprintf(stderr, "eulerian path does not exist\n");
+		cleanup(adj, v);
 		return 1;
 	}
 
-	/* cleanup */
-	for (i = 0; i < v; i++)	{
-		list_destroy(adj[i]);
-	}
-	free(adj);
+	printf("%d\n", location);
+
+	cleanup(adj, v);
 }
 
 list_t * list_new() {
@@ -166,4 +170,12 @@ void list_destroy(list_t *list) {
 	}
 
 	free(list);
+}
+
+void cleanup(list_t **adj, int v) {
+	int i;
+	for (i = 0; i < v; i++)	{
+		list_destroy(adj[i]);
+	}
+	free(adj);
 }
