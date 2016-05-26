@@ -70,6 +70,7 @@ int main(int argc, char** argv)
 		list_print(adj[i]);
 
 		printf("%d\n", list_pop(adj[i]));
+		printf("%d\n", list_pop(adj[i]));
 
 		printf("%d ->", i);
 		list_print(adj[i]);
@@ -109,25 +110,23 @@ void list_push(list_t *list, int val) {
 }
 
 int list_pop(list_t *list) {
-	list_node_t *current = list->head;
-	list_node_t *next = current->next;
+	list_node_t *current = list->head,
+	            *last = current->next;
 	int val;
 
-	if (next == NULL) {
-		val = current->val;
+	if (last == NULL) {
+		last = current;
 		list->head = NULL;
-		free(current);
-		return val;
+	} else {
+		while (last->next != NULL) {
+			current = last;
+			last = last->next;
+		}
+		current->next = NULL;
 	}
 
-	while (next->next != NULL) {
-		current = next;
-		next = next->next;
-	}
-
-	val = next->val;
-	current->next = NULL;
-	free(next);
+	val = last->val;
+	free(last);
 	return val;
 }
 
