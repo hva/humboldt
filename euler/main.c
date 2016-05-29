@@ -19,9 +19,10 @@ void list_push(list_t *, int);
 int list_pop(list_t *);
 void list_remove(list_t *, int);
 int list_len(list_t *);
+int list_has_nodes(list_t *);
 void list_print(list_t *);
 void list_destroy(list_t *);
-void cleanup(list_t **, int);
+void list_destroy_many(list_t **, int);
 
 int main(int argc, char** argv)
 {
@@ -61,7 +62,7 @@ int main(int argc, char** argv)
 		if (x == 0) {
 			fprintf(stderr, "invalid input\n");
 			fclose(fi);
-			cleanup(adj, v);
+			list_destroy_many(adj, v);
 			return 1;
 		}
 		list_push(adj[a], b);
@@ -82,11 +83,34 @@ int main(int argc, char** argv)
 
 	if (odd != 0 && odd != 2) {
 		fprintf(stderr, "eulerian path does not exist\n");
-		cleanup(adj, v);
+		list_destroy_many(adj, v);
 		return 1;
 	}
 
-	cleanup(adj, v);
+	/* algorithm */
+	list_t *stack = list_new(), *circuit = list_new();
+	int next;
+	while (list_has_nodes(adj[location]) || list_has_nodes(stack)) {
+		if (!list_has_nodes(adj[location])) {
+			list_push(circuit, location);
+			location = list_pop(stack);
+		} else {
+			list_push(stack, location);
+			next = list_pop(adj[location]);
+			list_remove(adj[next], location);
+			location = next;
+		}
+	}
+	list_push(circuit, location);
+
+	/* print result */
+	printf("eulerian path:");
+	list_print(circuit);
+
+	/* cleanup */
+	list_destroy(stack);
+	list_destroy(circuit);
+	list_destroy_many(adj, v);
 }
 
 list_t * list_new() {
@@ -168,6 +192,10 @@ int list_len(list_t *list) {
 	return len;
 }
 
+int list_has_nodes(list_t *list) {
+	return list->head != NULL;
+}
+
 void list_print(list_t *list) {
 	list_node_t *current = list->head;
 	while(current != NULL) {
@@ -188,7 +216,7 @@ void list_destroy(list_t *list) {
 	free(list);
 }
 
-void cleanup(list_t **adj, int v) {
+void list_destroy_many(list_t **adj, int v) {
 	int i;
 	for (i = 0; i < v; i++)	{
 		list_destroy(adj[i]);
