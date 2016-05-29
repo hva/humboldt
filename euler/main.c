@@ -17,6 +17,7 @@ list_t * list_new();
 list_node_t * list_node_new(int);
 void list_push(list_t *, int);
 int list_pop(list_t *);
+void list_remove(list_t *, int);
 int list_len(list_t *);
 void list_print(list_t *);
 void list_destroy(list_t *);
@@ -85,8 +86,6 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	printf("%d\n", location);
-
 	cleanup(adj, v);
 }
 
@@ -106,33 +105,57 @@ list_node_t * list_node_new(int val) {
 }
 
 void list_push(list_t *list, int val) {
-	list_node_t *node = list_node_new(val), *current;
+	list_node_t *node = list_node_new(val), *h;
 
-	if (list->head == NULL) {
-		list->head = node;
-		return;
-	}
-
-	current = list->head;
+	h = list->head;
 	list->head = node;
-	current->next = node;
-	node->prev = current;
+	if (h != NULL) {
+		h->next = node;
+		node->prev = h;
+	}
 }
 
 int list_pop(list_t *list) {
-	list_node_t *last = list->head;
-	int val = last->val;
+	list_node_t *h = list->head;
+	int val = h->val;
 
-	if (last->prev == NULL) {
-		list->head = NULL;
+	if (h->prev != NULL) {
+		h->prev->next = NULL;
 	}
-	else {
-		list->head = last->prev;
-		list->head->next = NULL;
-	}
+	list->head = h->prev;
 
-	free(last);
+	free(h);
 	return val;
+}
+
+void list_remove(list_t *list, int val) {
+	list_node_t *current = list->head, *search = NULL;
+
+	while (current != NULL) {
+		if (current->val == val) {
+			search = current;
+			break;
+		}
+		current = current->prev;
+	}
+
+	if (search == NULL) {
+		return;
+	}
+
+	if (search->prev != NULL) {
+		search->prev->next = search->next;
+	}
+
+	if (search->next != NULL) {
+		search->next->prev = search->prev;
+	}
+
+	if (search == list->head) {
+		list->head = search->prev;
+	}
+
+	free(search);
 }
 
 int list_len(list_t *list) {
@@ -147,12 +170,9 @@ int list_len(list_t *list) {
 
 void list_print(list_t *list) {
 	list_node_t *current = list->head;
-	while(current->prev != NULL) {
-		current = current->prev;
-	}
 	while(current != NULL) {
 		printf(" %d", current->val);
-		current = current->next;
+		current = current->prev;
 	}
 	printf("\n");
 }
