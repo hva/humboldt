@@ -5,6 +5,7 @@
 typedef struct list_node {
 	int val;
 	struct list_node *next;
+	struct list_node *prev;
 } list_node_t;
 
 typedef struct {
@@ -13,6 +14,7 @@ typedef struct {
 
 /* functions */
 list_t * list_new();
+list_node_t * list_node_new(int);
 void list_push(list_t *, int);
 int list_pop(list_t *);
 int list_len(list_t *);
@@ -95,45 +97,40 @@ list_t * list_new() {
 	return list;
 }
 
-void list_push(list_t *list, int val) {
-	if (list == NULL) {
-		return;
-	}
-
+list_node_t * list_node_new(int val) {
 	list_node_t *node = malloc(sizeof(list_node_t));
 	node->val = val;
 	node->next = NULL;
+	node->prev = NULL;
+	return node;
+}
+
+void list_push(list_t *list, int val) {
+	list_node_t *node = list_node_new(val), *current;
 
 	if (list->head == NULL) {
 		list->head = node;
 		return;
 	}
 
-	list_node_t *current = list->head;
-	while (current->next != NULL) {
-		current = current->next;
-	}
-
+	current = list->head;
+	list->head = node;
 	current->next = node;
+	node->prev = current;
 }
 
 int list_pop(list_t *list) {
-	list_node_t *current = list->head,
-	            *last = current->next;
-	int val;
+	list_node_t *last = list->head;
+	int val = last->val;
 
-	if (last == NULL) {
-		last = current;
+	if (last->prev == NULL) {
 		list->head = NULL;
-	} else {
-		while (last->next != NULL) {
-			current = last;
-			last = last->next;
-		}
-		current->next = NULL;
+	}
+	else {
+		list->head = last->prev;
+		list->head->next = NULL;
 	}
 
-	val = last->val;
 	free(last);
 	return val;
 }
@@ -142,7 +139,7 @@ int list_len(list_t *list) {
 	int len = 0;
 	list_node_t *current = list->head;
 	while(current != NULL) {
-		current = current->next;
+		current = current->prev;
 		len++;
 	}
 	return len;
@@ -150,6 +147,9 @@ int list_len(list_t *list) {
 
 void list_print(list_t *list) {
 	list_node_t *current = list->head;
+	while(current->prev != NULL) {
+		current = current->prev;
+	}
 	while(current != NULL) {
 		printf(" %d", current->val);
 		current = current->next;
@@ -158,14 +158,10 @@ void list_print(list_t *list) {
 }
 
 void list_destroy(list_t *list) {
-	if (list == NULL) {
-		return;
-	}
-
 	list_node_t *current = list->head, *tmp;
 	while (current != NULL) {
 		tmp = current;
-		current = current->next;
+		current = current->prev;
 		free(tmp);
 	}
 
