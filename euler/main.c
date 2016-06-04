@@ -73,7 +73,7 @@ int main(int argc, char** argv)
 	fclose(fi);
 
 	/* check is eulerian path exists */
-	int odd = 0, location;
+	int odd = 0, location = 0;
 	for (i = 0; i < v; i++)	{
 		if (list_len(adj[i]) & 1) {
 			odd++;

@@ -1,10 +1,10 @@
 ## Running
 
-`$ gcc -std=c89 main.c && ./a.out examples/graph1.txt`
+`$ gcc -std=c89 main.c && ./a.out examples/graph7.txt`
 
 ## Leaks Checking
 
-`$ valgrind --leak-check=full --track-origins=yes --show-reachable=yes ./a.out examples/graph1.txt`
+`$ valgrind --leak-check=full --track-origins=yes --show-reachable=yes ./a.out examples/graph7.txt`
 
 ## Algorithm
 
