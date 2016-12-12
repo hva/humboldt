@@ -1,4 +1,4 @@
-package org.humboldt.junit;
+package org.humboldt;
 
 public class Calculator {
     public int evaluate(String expression) {
